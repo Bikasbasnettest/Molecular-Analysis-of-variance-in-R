@@ -1,0 +1,45 @@
+Biku<-read.csv("C:/Users/HP/OneDrive/Desktop/MoAVA/CDD.csv")
+Biku
+print(Biku)
+View(Biku)
+Elimin<-Biku[,-c(1)]
+Elimin
+options(max.print = 1000)
+options(scipen = 1000)
+library(NbClust)
+distance<-dist(Elimin)
+distance
+print(distance,digits=3)
+hc<-hclust(distance)
+plot(hc,labels=Biku$Gen)
+rect.hclust(hc, k=4, border = "purple")
+rect.hclust(hc, k=4, border = 2:6)
+library(circlize)
+circlize_dendrogram(hc)
+library(dendextend)
+dend <- as.dendrogram(hc)
+dend <- color_branches(dend, k = 4)  
+dend <- set(dend, "branches_lwd", 2)
+par(mar = c(1, 1, 1, 1))  
+circlize_dendrogram(dend, labels_track_height = 0.1) 
+genotype_names <- as.character(Biku$Genotypes)  
+labels(dend) <- genotype_names
+par(mar = c(1, 1, 1, 1))  
+P2<-circlize_dendrogram(dend, labels_track_height = 0.1)
+###3after assigning which genotypes or texa belongs to which cluster as population strature
+TAXA<-read.csv("C:/Users/HP/OneDrive/Desktop/MoAVA/Population stracture through cluster analysis .csv")
+TAXA$Population<-as.character(TAXA$Population)
+ind<-as.character(TAXA$taxa)
+Pop<-as.character(TAXA$Population)
+snpgen<-Biku
+####Convert a data.frame of allele data to a genind object.
+require(adegenet)
+?df2genind
+MolD <- df2genind(snpgen, ploidy = 1, ind.names = ind, sep = ",", 
+                  pop = Pop, strata = TAXA, check.ploidy = getOption("adegenet.check.ploidy"))
+MolD
+table(strata(MolD,~Population))
+library(poppr)
+agc<-as.genclone(MolD)
+AMOVA <- poppr.amova(agc, ~Population, clonecorrect = TRUE)
+AMOVA
