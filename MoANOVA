@@ -43,3 +43,5 @@ library(poppr)
 agc<-as.genclone(MolD)
 AMOVA <- poppr.amova(agc, ~Population, clonecorrect = TRUE)
 AMOVA
+amova.test <- randtest(AMOVA) # Test for significance
+plot(amova.test)
